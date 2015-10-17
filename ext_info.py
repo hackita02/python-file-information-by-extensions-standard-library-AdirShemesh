@@ -9,10 +9,19 @@ def create_suffix():
 
 
 suffixes = defaultdict(create_suffix)
-for p in Path(sys.argv[1]).iterdir():
-    if p.is_file():
-        suffixes[p.suffix or '.']['counter'] += 1
-        suffixes[p.suffix or '.']['size'] += p.stat().st_size
+try:
+    folder = Path(sys.argv[1])
+except IndexError:
+    print("""usage: ext_info.py path
+       displays number of files and total size of files per extension in the specified path.""")
+    exit()
+
+
+for file in folder.iterdir():
+    if file.is_file():
+        suffix = file.suffix[1:] or '.'
+        suffixes[suffix]['counter'] += 1
+        suffixes[suffix]['size'] += file.stat().st_size
 
 for name, info in sorted(suffixes.items()):
     print('{} {counter} {size}'.format(name, **info))
